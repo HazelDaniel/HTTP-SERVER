@@ -1,66 +1,36 @@
-var http = require("http");
-var PORT = 3000;
-var friends = [
-    {
-        id: 0,
-        name: "Sir Isaac Newton"
-    },
-    {
-        id: 1,
-        name: "Sir Nikola Tesla"
-    },
-    {
-        id: 2,
-        name: "Sir Albert Einstein"
-    },
-    {
-        id: 3,
-        name: "Miss. Marie curie"
-    },
-    {
-        id: 4,
-        name: "Sir Galileo Galilei"
-    },
-];
-var server = http.createServer(function (req, res) {
-    var urlPortions = req.url.split("/");
-    var portionIndex = +urlPortions[urlPortions.length - 1];
-    if (req.method === "POST" && urlPortions.length === 2 && urlPortions[1] === "friends") {
-        req.on("data", function (data) {
-            var dataUsable = data.toString();
-            friends.push(JSON.parse(dataUsable));
-        });
-        req.pipe(res);
-    }
-    if (req.method !== "GET")
-        return;
-    if (portionIndex >= friends.length) {
-        res.writeHead(200, {
-            "Content-Type": "text/plain"
-        });
-        res.end("not found!");
-    }
-    if (urlPortions.length === 2 && urlPortions[1] === "friends") {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const http_1 = require("http");
+const PORT = process.env.PORT || 5000;
+const server = (0, http_1.createServer)((req, res) => {
+    if (req.url === "/friends" || req.url === "/friends/") {
         res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify(friends));
+        res.setHeader("Content-Type", "text/html");
+        res.write("<html>");
+        res.write("<ul>");
+        res.write("<li>");
+        res.write("ada lovelace");
+        res.write("</li>");
+        res.write("<li>");
+        res.write("charles babbage");
+        res.write("</li>");
+        res.write("</ul>");
+        res.write("</html>");
+        res.end();
     }
     else if (req.url === "/") {
-        res.writeHead(200, {
-            "Content-Type": "text/plain"
-        });
-        res.end("Hello, welcome to your first server");
-    }
-    else if (urlPortions.length === 3) {
-        res.writeHead(200, {
-            "Content-Type": "application/json"
-        });
-        res.end(JSON.stringify(friends[portionIndex]));
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/html");
+        res.write("<html>");
+        res.write(`<p>your friend is Isaac Newton. Wanna find out who his friends are? <a href='http://127.0.0.1:${PORT}${req.url}friends/'> find out</a></p>`);
+        res.write("</html>");
+        res.end();
     }
     else {
         res.statusCode = 404;
+        res.end();
     }
 });
-server.listen(PORT, function () {
-    console.log("listening on port ".concat(PORT));
+server.listen(PORT, () => {
+    console.log(`server is active an listening on port ${PORT}`);
 });
